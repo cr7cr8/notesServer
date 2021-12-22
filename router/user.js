@@ -113,7 +113,7 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
 
 router.post("/resortuserlist", authenticateToken, async (req, res, next) => {
 
-    console.log(req.body)
+    //console.log(req.body)
 
     await User.updateOne({ userName: req.userName }, { listOrder: req.body })
     res.json("order updated")

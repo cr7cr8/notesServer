@@ -35,7 +35,7 @@ io.use(
     socket.userName = socket.handshake.auth.userName
 
     const decode = jwt.verify(socket.handshake.auth.token, "secretKey")
-    console.log(!!decode)
+    // console.log(!!decode)
 
     if (decode) {
       socket.token = socket.handshake.auth.token
@@ -72,16 +72,25 @@ io.on("connection", function (socket) {
 
   // socket.on("get")
 
-  socket.on("sendMessage", function (toPerson, msg) {
+  socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
+
+console.log(msgArr)
 
 
-    
     // socket.emit("messageFeedback", ...msg.map(item => { return item._id }))
 
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
-   
 
-    if (socket) { socket.emit("displayMessage", msg); }
+
+    if (socket) {
+      //  socket.emit("displayMessage" + sender, msg.map((msg) => { return { ...msg, sender } }));
+      //  socket.emit("writeMessage", msg.map((msg) => { return { ...msg, sender } }))
+
+      socket.emit("displayMessage" + sender, msgArr);
+      socket.emit("writeMessage", sender, msgArr)
+
+
+    }
     else {
       console.log("no socket found")
     }
