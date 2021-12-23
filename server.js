@@ -58,8 +58,13 @@ io.use(
 io.on("connection", function (socket) {
 
   console.log("socket " + socket.userName + " is connected")
+  socket.isAlive = true
+  // setInterval(
+  //   function () {
+  //     socket.emit("helloFromServer", new Date().toISOString())
+  //   }, 2000
 
-
+  // )
 
 
   // socket.emit("toClient", "socket " + socket.id + " is established on server")
@@ -72,19 +77,40 @@ io.on("connection", function (socket) {
 
   // socket.on("get")
 
+
+  socket.on("sendNotiToken", function (notiToken) {
+    console.log("---",notiToken)
+    socket.notiToken = notiToken
+
+    const message = {
+      to: socket.notiToken,
+      sound: 'default',
+      title: socket.userName,
+      body: socket.userName + " notiToken - From Server"+new Date().toISOString(),
+    };
+
+
+
+    fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    })
+
+  })
+
   socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
 
-console.log(msgArr)
 
-
-    // socket.emit("messageFeedback", ...msg.map(item => { return item._id }))
 
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
 
 
     if (socket) {
-      //  socket.emit("displayMessage" + sender, msg.map((msg) => { return { ...msg, sender } }));
-      //  socket.emit("writeMessage", msg.map((msg) => { return { ...msg, sender } }))
 
       socket.emit("displayMessage" + sender, msgArr);
       socket.emit("writeMessage", sender, msgArr)
@@ -92,13 +118,25 @@ console.log(msgArr)
 
     }
     else {
+      // record the message into DB if toPerson offline
       console.log("no socket found")
     }
   })
 
 
+  socket.on("helloFromClient", function (data) {
+
+    console.log("hello on server", data)
+
+    socket.emit("helloFromServer", new Date().toISOString())
+  })
+
+
+
   socket.on("disconnecting", function (reason) {
     // socket.leave(socket.userName) done automatically
+
+    socket.isAlive = false
     console.log(`socket ${socket.userName} is disconnected`)
   })
 
