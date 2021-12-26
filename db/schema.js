@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema({
 
   },
 
+  notiToken:{
+    type:String,
+   
+    default:"",
+  },
+
   description: {
     type: String,
     required: false,

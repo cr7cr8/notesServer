@@ -5,6 +5,8 @@ const cors = require("cors");
 const socketIO = require("socket.io")
 
 const user = require("./router/user")
+const { User } = require("./db/schema")
+
 const image = require("./router/image")
 
 const fetch = require('node-fetch');
@@ -79,27 +81,28 @@ io.on("connection", function (socket) {
 
 
   socket.on("sendNotiToken", function (notiToken) {
-    console.log("---",notiToken)
+    console.log("---", notiToken)
     socket.notiToken = notiToken
+    console.log("ooo", socket.notiToken)
 
-    const message = {
-      to: socket.notiToken,
-      sound: 'default',
-      title: socket.userName,
-      body: socket.userName + " notiToken - From Server"+new Date().toISOString(),
-    };
+    // const message = {
+    //   to: socket.notiToken,
+    //   sound: 'default',
+    //   title: socket.userName,
+    //   body: socket.userName + " notiToken - From Server" + new Date().toISOString(),
+    // };
 
 
 
-    fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(message),
-    })
+    // fetch('https://exp.host/--/api/v2/push/send', {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Accept-encoding': 'gzip, deflate',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(message),
+    // })
 
   })
 
@@ -109,17 +112,76 @@ io.on("connection", function (socket) {
 
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
 
-
     if (socket) {
 
       socket.emit("displayMessage" + sender, msgArr);
       socket.emit("writeMessage", sender, msgArr)
-
+      socket.emit("checkListeners", sender, msgArr)
 
     }
     else {
-      // record the message into DB if toPerson offline
-      console.log("no socket found")
+      console.log("socket unfound")
+
+      //  user.findOne({ userName: toPerson }).then(doc)
+
+      User.findOne({ userName: toPerson }).then(doc => {
+
+        console.log(doc.notiToken)
+
+        if (doc.notiToken) {
+
+
+
+
+
+          fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Accept-encoding': 'gzip, deflate',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: doc.notiToken,
+              sound: 'default',
+              title: sender,
+            
+              body: msgArr[0].text + " made by server",
+
+            }),
+          })
+
+        }
+
+
+      })
+      // const socket = socketArr.reverse().find(socket => {
+
+      //   console.log(socket.userName)
+      //   return socket.userName === toPerson
+      // })
+      // console.log(socket)
+
+
+      // const message = {
+      //   to: socket.notiToken,
+      //   sound: 'default',
+      //   title: sender,
+      //   body: msgArr[0].text,
+      // };
+
+
+      // fetch('https://exp.host/--/api/v2/push/send', {
+      //   method: 'POST',
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Accept-encoding': 'gzip, deflate',
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(message),
+      // })
+
+
     }
   })
 

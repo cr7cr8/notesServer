@@ -68,8 +68,8 @@ router.post("/reguser", async (req, res, next) => {
 
 
         const socket = getSocket(doc.userName)
-        if (socket&&socket.isAlive) {
-            socket.emit("updateList","hihihi")
+        if (socket && socket.isAlive) {
+            socket.emit("updateList", "hihihi")
         }
 
     })
@@ -118,9 +118,17 @@ router.post("/resortuserlist", authenticateToken, async (req, res, next) => {
     await User.updateOne({ userName: req.userName }, { listOrder: req.body })
     res.json("order updated")
 
+})
 
+router.post("/updatenotitoken", authenticateToken,  (req, res, next) => {
+
+    console.log(req.userName, req.body.notiToken)
+
+    User.updateOne({ userName: req.userName }, { notiToken: req.body.notiToken }).exec()
+    res.json("aa")
 
 })
+
 
 
 module.exports = router
