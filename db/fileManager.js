@@ -24,7 +24,7 @@ function createFileManager(connDB, collectionName) {
     isFileThere: function (req, res, next) { return isFileThere(connDB, collectionName, req, res, next) },
 
     getSmallImageArray: function (req, res, next) { return getSmallImageArray(connDB, collectionName, req, res, next) },
-
+    getSmallImageArray2: function (req, res, next) { return getSmallImageArray2(connDB, collectionName, req, res, next) },
 
     connDB,
     collectionName,
@@ -75,6 +75,10 @@ function uploadFile(connDB, collectionName, req, res, next) {
       metadata: {
         ...req.body.obj, fieldname, originalname, encoding, mimetype, size, oriantation,
 
+        ...req.body.imageWidth && { imageWidth },
+        ...req.body.imageHeight && { imageHeight },
+        deleteByOwner: false,
+        deleteByToPerson: false,
         mongooseID: String(mongooseID)
       },
       contentType: file.mimetype,
@@ -85,7 +89,10 @@ function uploadFile(connDB, collectionName, req, res, next) {
 
       req.files[index].mongooseID = gfsws.id
       req.body.obj.mongooseID = gfsws.id
-
+      // console.log("image body  ", req.body.obj.imageWidth, req.body.obj.imageHeight)
+      // console.log("image size ", imageWidth, imageHeight)
+      imageWidth = null
+      imageHeight = null
       if (index === req.files.length - 1) {
         //  console.log("==== All files uploading is done ===");
 
@@ -271,7 +278,7 @@ function deleteFileByUserName(connDB, collectionName, req, res, next) {
 function deleteOldFile(connDB, collectionName, req, res, next) {
 
   next()
-  console.log("xxxxxxxxxxxxxxxxxxxx")
+
   var gfs = new mongoose.mongo.GridFSBucket(connDB.db, {
     chunkSizeBytes: 255 * 1024,
     bucketName: collectionName,
@@ -329,7 +336,7 @@ function getSmallImageArray(connDB, collectionName, req, res, next, ) {
 
 
     Jimp.read(imgFile.buffer).then(function (image) {
-     
+
 
 
 
@@ -352,8 +359,73 @@ function getSmallImageArray(connDB, collectionName, req, res, next, ) {
         if (index === req.files.length - 1) { next() }
       }
     }).catch(err => { console.log("error in Jimp reading file array ", err) })
-  
-  
+
+
+  })
+
+}
+
+let imageWidth = null
+let imageHeight = null
+function getSmallImageArray2(connDB, collectionName, req, res, next, ) {
+
+  req.files.forEach(function (imgFile, index) {
+
+
+    Jimp.read(imgFile.buffer).then(function (image) {
+
+
+
+
+      const { width, height } = image.bitmap;
+      //req.files[index].oriantation = width >= height ? "horizontal" : "verticle"
+
+
+      if (width * height >= 800 * 800) {
+
+
+        if (width <= height) {
+          imageWidth = width * 800 / height
+          imageHeight = 800
+      
+        }
+
+        else if (width > height) {
+
+          imageHeight = height * 800 / width
+          imageWidth = 800
+     
+
+        }
+
+
+
+
+
+        image.resize(width >= height ? 800 : Jimp.AUTO, height >= width ? 800 : Jimp.AUTO)
+          .quality(60)
+          .getBufferAsync(image.getMIME())
+          .then(function (imgBuffer) {
+
+            req.files[index].buffer = imgBuffer;
+            req.files[index].size = imgBuffer.length;
+
+            if (index === req.files.length - 1) { next() }
+          }).catch(err => { console.log("error in converting small pic image ", err) })
+
+      }
+      else {
+
+        imageWidth = width
+        imageHeight = height
+    
+
+
+        if (index === req.files.length - 1) { next() }
+      }
+    }).catch(err => { console.log("error in Jimp reading file array ", err) })
+
+
   })
 
 }
@@ -363,6 +435,9 @@ function getSmallImageArray(connDB, collectionName, req, res, next, ) {
 module.exports = [
   {
     ...createFileManager(connDB, "avatar"),
+  },
+  {
+    ...createFileManager(connDB, "image"),
   },
   {
     ...createFileManager(connDB, "picture"),

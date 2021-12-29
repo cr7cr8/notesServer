@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs")
-const { User } = require("../db/schema")
+const { User, Message } = require("../db/schema")
 const { authenticateToken, generateAndDispatchToken } = require('../middleware/auth')
 //const fs = require("fs")
 
@@ -120,7 +120,40 @@ router.post("/resortuserlist", authenticateToken, async (req, res, next) => {
 
 })
 
-router.post("/updatenotitoken", authenticateToken,  (req, res, next) => {
+router.get("/fecthunread", authenticateToken, async (req, res, next) => {
+
+
+    let docs = await Message.find({ toPerson: req.userName })
+    await Message.deleteMany({ toPerson: req.userName })
+
+    docs = docs.map(doc => {
+
+        const obj = doc._doc
+
+        const image = obj.image
+        const imageWidth = obj.imageWidth
+        const imageHeight = obj.imageHeight
+
+        delete obj.image
+        delete obj.__v
+        delete imageWidth
+        delete imageHeight
+        return {
+            ...obj,
+            ...image && { image },
+            ...imageWidth && { imageWidth },
+            ...imageHeight && { imageHeight }
+        }
+
+    })
+    
+    res.json(docs)
+
+})
+
+
+
+router.post("/updatenotitoken", authenticateToken, (req, res, next) => {
 
     console.log(req.userName, req.body.notiToken)
 

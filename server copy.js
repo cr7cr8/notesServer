@@ -19,9 +19,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/user", user)
 app.use("/api/image", image)
 
-
-
-
 const server = app.listen(process.env.PORT || 80)
 
 const io = socketIO(server)
@@ -88,13 +85,30 @@ io.on("connection", function (socket) {
     socket.notiToken = notiToken
     console.log("ooo", socket.notiToken)
 
+    // const message = {
+    //   to: socket.notiToken,
+    //   sound: 'default',
+    //   title: socket.userName,
+    //   body: socket.userName + " notiToken - From Server" + new Date().toISOString(),
+    // };
 
+
+
+    // fetch('https://exp.host/--/api/v2/push/send', {
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Accept-encoding': 'gzip, deflate',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(message),
+    // })
 
   })
 
   socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
 
-    //console.log(msgArr)
+    console.log(msgArr)
 
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
 
@@ -111,56 +125,62 @@ io.on("connection", function (socket) {
       //todo write the incoming unread msg into db
 
 
+      User.findOne({ userName: toPerson }).then(doc => {
 
+        console.log(doc.notiToken)
 
-      User.findOne({ userName: toPerson })
-        .then(doc => {
-          msgArr.forEach(msg => {
+        if (doc.notiToken) {
 
-            Message.create({ ...msg, toPerson })
+          fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Accept-encoding': 'gzip, deflate',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: doc.notiToken,
+              sound: 'default',
+              title: sender,
 
+              body: msgArr[0].text + " made by server",
+
+            }),
           })
-          return doc
-        })
-        .then(doc => {
 
-          //  console.log(doc.notiToken)
+        }
 
-          // if (doc.notiToken) {
 
-          //   fetch('https://exp.host/--/api/v2/push/send', {
-          //     method: 'POST',
-          //     headers: {
-          //       Accept: 'application/json',
-          //       'Accept-encoding': 'gzip, deflate',
-          //       'Content-Type': 'application/json',
-          //     },
-          //     body: JSON.stringify({
-          //       to: doc.notiToken,
-          //       sound: 'default',
-          //       title: sender,
-          //       body: msgArr[0].text + " made by server",
-          //     }),
-          //   }).then(response => {
-          //     console.log(msgArr[0]._id, response.headers.get('content-type'), response.status)
-          //   })
-          // }
+      })
+      // const socket = socketArr.reverse().find(socket => {
 
-          return doc
-        })
+      //   console.log(socket.userName)
+      //   return socket.userName === toPerson
+      // })
+      // console.log(socket)
 
+
+      // const message = {
+      //   to: socket.notiToken,
+      //   sound: 'default',
+      //   title: sender,
+      //   body: msgArr[0].text,
+      // };
+
+
+      // fetch('https://exp.host/--/api/v2/push/send', {
+      //   method: 'POST',
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Accept-encoding': 'gzip, deflate',
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(message),
+      // })
 
 
     }
   })
-
-  socket.on("fectchUnread", async function () {
-
-    // const docs = await Message.find({toPerson:socket.userName})
-    // console.log(docs)
-
-  })
-
 
 
   socket.on("helloFromClient", function (data) {
@@ -181,8 +201,4 @@ io.on("connection", function (socket) {
 
 
 
-})
-
-
-
-
+}) 
