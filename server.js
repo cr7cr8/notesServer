@@ -163,12 +163,10 @@ io.on("connection", function (socket) {
 
 
 
-  socket.on("helloFromClient", function (data) {
-
-    console.log("hello on server", data)
-
-    socket.emit("helloFromServer", new Date().toISOString())
-  })
+  // socket.on("helloFromClient", function (data) {
+  //   console.log("hello on server", data)
+  //   socket.emit("helloFromServer", new Date().toISOString())
+  // })
 
 
 
