@@ -68,8 +68,10 @@ const messageSchema = new mongoose.Schema({
   toPerson: String,
   image: { type: String, default: null },
   imageWidth: { type: Number, default: null },
-  imageHeight: { type: Number, default: null }
-
+  imageHeight: { type: Number, default: null },
+  audio:{ type: String, default: null },
+  durationMillis:{ type: Number, default: null },
+  mongooseID:{ type: String, default: null },
 },
   {
     toObject: { virtuals: true },

@@ -440,9 +440,9 @@ module.exports = [
     ...createFileManager(connDB, "image"),
   },
   {
-    ...createFileManager(connDB, "picture"),
+    ...createFileManager(connDB, "audio"),
   },
-
+ 
 
 ]
 

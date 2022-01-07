@@ -8,6 +8,7 @@ const user = require("./router/user")
 const { User, Message } = require("./db/schema")
 
 const image = require("./router/image")
+const audio = require("./router/audio")
 
 const fetch = require('node-fetch');
 const jwt = require("jsonwebtoken")
@@ -18,7 +19,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use("/api/user", user)
 app.use("/api/image", image)
-
+app.use("/api/audio", audio)
 
 
 
@@ -32,6 +33,10 @@ user.socketArr = socketArr
 
 image.io = io
 image.socketArr = socketArr
+
+audio.io = io
+audio.socketArr = socketArr
+
 
 io.use(
   function (socket, next) {
@@ -94,8 +99,11 @@ io.on("connection", function (socket) {
 
   socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
 
-    //console.log(msgArr)
+    msgArr.forEach(msg=>{
+      msg.audio&&console.log(msg)
+    })
 
+    
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
 
     if (socket) {
@@ -153,6 +161,10 @@ io.on("connection", function (socket) {
 
     }
   })
+
+
+
+
 
   socket.on("fectchUnread", async function () {
 
