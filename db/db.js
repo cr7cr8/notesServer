@@ -1,17 +1,18 @@
 const mongoose = require("mongoose")
 mongoose.connection.on('error', function (err) {
- 
+
     console.log("mongoose connecting  error", err)
 });
 
 const { connDB, connDB2, connDB3, connDB4, connEmojiDB, DB, EmojiDB, connParam } = {
 
     DB: "mongodb+srv://boss:ABCabc123@cluster0-lsf8g.azure.mongodb.net/notesDB?retryWrites=true&w=majority",
-   
-   // connParam: { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: true,/*poolSize:10*/ },
+
+    // connParam: { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: true,/*poolSize:10*/ },
 
     get connDB() {
         return mongoose.createConnection(this.DB, this.connParam)
+
     },
     get connDB2() {
         return mongoose.createConnection(this.DB, this.connParam)
@@ -21,10 +22,12 @@ const { connDB, connDB2, connDB3, connDB4, connEmojiDB, DB, EmojiDB, connParam }
     },
     get connDB4() {
         return mongoose.createConnection(this.DB, this.connParam)
-    },
-  
 
- 
+
+    }
+
+
+
 
 }
 
@@ -57,6 +60,6 @@ module.exports = {
     connDB2,
     connDB3,
     connDB4,
-   
+
     wrapAndMerge,
 }

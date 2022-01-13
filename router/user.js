@@ -111,6 +111,19 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
     res.json(arr)
 })
 
+router.get("/fetchuserlist2", async (req, res, next) => {
+
+
+    const docs = await User.find({})
+
+    //console.log(docs)
+
+    res.json(docs.map(item => item.userName))
+})
+
+
+
+
 router.post("/resortuserlist", authenticateToken, async (req, res, next) => {
 
     //console.log(req.body)
@@ -146,7 +159,7 @@ router.get("/fecthunread", authenticateToken, async (req, res, next) => {
         }
 
     })
-    
+
     res.json(docs)
 
 })

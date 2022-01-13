@@ -98,10 +98,14 @@ io.on("connection", function (socket) {
   })
 
   socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
+console.log("fds")
+    if(sender===toPerson){
+      return
+    }
 
-    msgArr.forEach(msg=>{
-      msg.audio&&console.log(msg)
-    })
+    // msgArr.forEach(msg=>{
+    //   msg.audio&&console.log(msg)
+    // })
 
     
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
@@ -162,10 +166,7 @@ io.on("connection", function (socket) {
     }
   })
 
-
-
-
-
+  
   socket.on("fectchUnread", async function () {
 
     // const docs = await Message.find({toPerson:socket.userName})
@@ -175,10 +176,14 @@ io.on("connection", function (socket) {
 
 
 
-  // socket.on("helloFromClient", function (data) {
-  //   console.log("hello on server", data)
-  //   socket.emit("helloFromServer", new Date().toISOString())
-  // })
+  socket.on("sendToAll", function ({ sender, toPerson, msgArr }) {
+   
+
+
+    const msg = msgArr[0]
+    console.log(msg.text)
+
+  })
 
 
 
