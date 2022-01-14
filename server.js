@@ -98,8 +98,7 @@ io.on("connection", function (socket) {
   })
 
   socket.on("sendMessage", function ({ sender, toPerson, msgArr }) {
-console.log("fds")
-    if(sender===toPerson){
+    if (sender === toPerson) {
       return
     }
 
@@ -107,7 +106,7 @@ console.log("fds")
     //   msg.audio&&console.log(msg)
     // })
 
-    
+
     const socket = socketArr.find(socket => { return socket.userName === toPerson && socket.isAlive })
 
     if (socket) {
@@ -136,27 +135,27 @@ console.log("fds")
         })
         .then(doc => {
 
-          //  console.log(doc.notiToken)
+           console.log(doc.notiToken)
 
-          // if (doc.notiToken) {
+          if (doc.notiToken) {
 
-          //   fetch('https://exp.host/--/api/v2/push/send', {
-          //     method: 'POST',
-          //     headers: {
-          //       Accept: 'application/json',
-          //       'Accept-encoding': 'gzip, deflate',
-          //       'Content-Type': 'application/json',
-          //     },
-          //     body: JSON.stringify({
-          //       to: doc.notiToken,
-          //       sound: 'default',
-          //       title: sender,
-          //       body: msgArr[0].text + " made by server",
-          //     }),
-          //   }).then(response => {
-          //     console.log(msgArr[0]._id, response.headers.get('content-type'), response.status)
-          //   })
-          // }
+            fetch('https://exp.host/--/api/v2/push/send', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: doc.notiToken,
+                sound: 'default',
+                title: sender,
+                body: msgArr[0].text + " made by server",
+              }),
+            }).then(response => {
+              console.log(msgArr[0]._id, response.headers.get('content-type'), response.status)
+            })
+          }
 
           return doc
         })
@@ -166,7 +165,7 @@ console.log("fds")
     }
   })
 
-  
+
   socket.on("fectchUnread", async function () {
 
     // const docs = await Message.find({toPerson:socket.userName})
@@ -177,11 +176,46 @@ console.log("fds")
 
 
   socket.on("sendToAll", function ({ sender, toPerson, msgArr }) {
-   
+
+    let onlineUsers = []
+    onlineUsers.push(sender)
+    onlineUsers.push("AllUser")
+
+    socketArr.forEach(socket => {
+      if (socket.isAlive && (socket.userName !== sender)) {
+
+        socket.emit("displayRoomMessage", msgArr)
+        socket.emit("writeRoomMessage", sender, msgArr)
+
+        onlineUsers.push(socket.userName)
+      }
+      else {
 
 
-    const msg = msgArr[0]
-    console.log(msg.text)
+
+      }
+    })
+
+    User.find({}).then(docs => {
+      onlineUsers = [...new Set(onlineUsers)];
+      const allUsers = docs.map(item => item.userName)
+      const offlineUsers = allUsers.filter(item => !onlineUsers.includes(item))
+
+     // console.log(offlineUsers)
+
+      const msg = msgArr[0]
+
+      msg.waitingUsers = offlineUsers
+      Message.create(msg)
+
+    })
+
+
+    //const msg = msgArr[0]
+    //console.log(msg)
+
+
+
 
   })
 

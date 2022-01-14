@@ -69,9 +69,13 @@ const messageSchema = new mongoose.Schema({
   image: { type: String, default: null },
   imageWidth: { type: Number, default: null },
   imageHeight: { type: Number, default: null },
-  audio:{ type: String, default: null },
-  durationMillis:{ type: Number, default: null },
-  mongooseID:{ type: String, default: null },
+  audio: { type: String, default: null },
+  audioName: { type: String, default: null },
+  durationMillis: { type: Number, default: null },
+  mongooseID: { type: String, default: null },
+
+  waitingUsers: { type: [String], default: [] },
+
 },
   {
     toObject: { virtuals: true },

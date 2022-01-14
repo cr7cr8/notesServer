@@ -4,10 +4,23 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs")
 const { User, Message } = require("../db/schema")
 const { authenticateToken, generateAndDispatchToken } = require('../middleware/auth')
+
+
+
 //const fs = require("fs")
 
 //const [{ checkConnState, getFileArray, uploadFile, deleteFileByUserName, downloadFile }] = require("../db/fileManager");
 //const { getSmallImageArray, makeAvatar, makeBackPicture, getAvatarImageArray } = require("../db/picManager");
+
+
+const [
+    { },
+    { },
+
+    { checkConnState, getFileArray, getSmallImageArray, uploadFile, downloadFile, deleteFileById, deleteOldFile },
+
+
+] = require("../db/fileManager");
 
 
 function getSocket(userName) {
@@ -133,47 +146,139 @@ router.post("/resortuserlist", authenticateToken, async (req, res, next) => {
 
 })
 
-router.get("/fecthunread", authenticateToken, async (req, res, next) => {
+router.get("/fecthunread", authenticateToken,
 
 
-    let docs = await Message.find({ toPerson: req.userName })
-    await Message.deleteMany({ toPerson: req.userName })
+    function (req, res, next) {
 
-    docs = docs.map(doc => {
+        const socket = getSocket(req.userName)
 
-        const obj = doc._doc
+        Message.find({ $and: [{ toPerson: "AllUser" }, { waitingUsers: [] }] }).then(docs => {
 
-        const image = obj.image
-        const imageWidth = obj.imageWidth
-        const imageHeight = obj.imageHeight
 
-        delete obj.image
-        delete obj.__v
-        delete imageWidth
-        delete imageHeight
-        return {
-            ...obj,
-            ...image && { image },
-            ...imageWidth && { imageWidth },
-            ...imageHeight && { imageHeight }
-        }
+            if (docs.length === 0) {
+                next()
+            }
+            else {
+                docs.forEach((doc, index) => {
+
+                    //todo delete audio if no waiting users
+                    // if (Boolean(doc.mongooseID) && Boolean(doc.audioName)) {
+                    //     socket.emit("deleteAudio", doc.mongooseID)
+                    // }
+                  
+                    Message.deleteOne({ _id: doc._id }).then(doc => {
+                      //  console.log(doc)
+                        if (index === docs.length - 1) {
+                            next()
+                        }
+                    })
+
+                })
+            }
+
+        })
+
+
+
+    },
+
+
+    async (req, res, next) => {
+
+
+
+
+
+
+
+        let docs = await Message.find(
+
+            {
+                $or: [
+                    { toPerson: req.userName },
+                    {
+                        $and: [{ toPerson: "AllUser" }, { waitingUsers: { "$in": [req.userName] } }]
+                    }
+                ]
+            }
+        )
+
+
+
+        await Message.deleteMany({ toPerson: req.userName })
+        await Message.updateMany({}, { "$pull": { waitingUsers: { "$in": [req.userName] } } })
+
+
+
+        //    Message.updateMany({waitingUsers:{"$in":[req.userName]}}   ,      )
+
+
+        docs = docs.map(doc => {
+
+
+
+
+            const obj = doc._doc
+
+            const image = obj.image
+            const imageWidth = obj.imageWidth
+            const imageHeight = obj.imageHeight
+
+            const audio = obj.audio
+            const audioName = obj.audioName
+
+
+            delete obj.image
+            delete obj.__v
+            delete imageWidth
+            delete imageHeight
+            delete obj.audio
+            delete obj.audioName
+
+
+            return {
+                ...obj,
+                ...image && { image },
+                ...imageWidth && { imageWidth },
+                ...imageHeight && { imageHeight },
+
+                ...audio && { audio },
+                ...audioName && { audioName }
+
+            }
+
+        })
+
+
+
+
+
+        res.json(docs)
 
     })
-
-    res.json(docs)
-
-})
 
 
 
 router.post("/updatenotitoken", authenticateToken, (req, res, next) => {
-
     console.log(req.userName, req.body.notiToken)
-
     User.updateOne({ userName: req.userName }, { notiToken: req.body.notiToken }).exec()
     res.json("aa")
+})
+
+router.get("/hasAvatar/:personName", (req, res, next) => {
+
+    User.findOne({ userName: req.params.personName }, {}).then(doc => {
+
+
+        res.json(Boolean(doc && doc.hasAvatar))
+
+    })
+
+
 
 })
+
 
 
 

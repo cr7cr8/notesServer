@@ -325,10 +325,11 @@ function deleteFileById(connDB, collectionName, req, res, next) {
     next()
   })
 
-
-
-
 }
+
+
+
+
 
 function getSmallImageArray(connDB, collectionName, req, res, next, ) {
 
