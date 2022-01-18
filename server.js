@@ -37,7 +37,7 @@ audio.io = io
 audio.socketArr = socketArr
 
 
-app.get("/check", function (req, res, next) {
+app.get("/", function (req, res, next) {
   const onlineArr = socketArr.filter(socket => socket.isAlive)
 
   res.send(
