@@ -22,7 +22,6 @@ app.use("/api/image", image)
 app.use("/api/audio", audio)
 
 
-
 const server = app.listen(process.env.PORT || 80)
 
 const io = socketIO(server)
@@ -36,6 +35,21 @@ image.socketArr = socketArr
 
 audio.io = io
 audio.socketArr = socketArr
+
+
+app.get("/check", function (req, res, next) {
+  const onlineArr = socketArr.filter(socket => socket.isAlive)
+
+  res.send(
+    `<h2>${new Date()} current online: ${onlineArr.length}</h2>
+   ${onlineArr.map(socket =>socket.userName)}
+  
+  
+  
+ `)
+
+})
+
 
 
 io.use(
@@ -135,7 +149,7 @@ io.on("connection", function (socket) {
         })
         .then(doc => {
 
-           console.log(doc.notiToken)
+          console.log(doc.notiToken)
 
           if (doc.notiToken) {
 
@@ -201,7 +215,7 @@ io.on("connection", function (socket) {
       const allUsers = docs.map(item => item.userName)
       const offlineUsers = allUsers.filter(item => !onlineUsers.includes(item))
 
-     // console.log(offlineUsers)
+      // console.log(offlineUsers)
 
       const msg = msgArr[0]
 
