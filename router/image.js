@@ -8,7 +8,7 @@ const { authenticateToken, generateAndDispatchToken } = require('../middleware/a
 const { connDB, connDB2, connDB3, connDB4, connEmojiDB } = require("../db/db");
 
 const [
-  { checkConnState, getFileArray, getSmallImageArray, uploadFile, downloadFile, deleteFileById, deleteOldFile },
+  { checkConnState, getFileArray, getSmallImageArray, uploadFile, downloadFile, deleteFileById, deleteOldFile,deleteFileByUserName },
 
   {
     checkConnState: checkConnState2,
@@ -76,6 +76,26 @@ router.post("/upload",
 
 
   }, generateAndDispatchToken)
+
+router.post("/updateavatar", authenticateToken,
+  checkConnState,
+  getFileArray,
+  deleteFileByUserName,
+  uploadFile,
+  function (req, res, next) {
+
+    const randomStr = String(Math.random())
+    User.updateOne({userName:req.userName},{hasAvatar:true,randomStr:randomStr}).then(doc=>{
+      console.log(req.body)
+      res.json(randomStr)
+    })
+
+    
+  }
+
+)
+
+
 
 router.get("/avatar/:username",
   checkConnState,

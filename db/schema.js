@@ -34,8 +34,12 @@ const userSchema = new mongoose.Schema({
   listOrder: {
     type: [String],
     default: []
-  }
+  },
 
+  randomStr:{
+    type:String,
+    default: String(Math.random())
+  }
   // pushNotificationOn: {
   //   type: Boolean,
   //   required: true,

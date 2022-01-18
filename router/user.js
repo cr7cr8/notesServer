@@ -117,6 +117,7 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
     arr = arr.map((item) => {
         return {
             name: item.userName,
+            randomStr:item.randomStr,
             hasAvatar: item.hasAvatar,
             key: Math.random()
         }
@@ -166,9 +167,9 @@ router.get("/fecthunread", authenticateToken,
                     // if (Boolean(doc.mongooseID) && Boolean(doc.audioName)) {
                     //     socket.emit("deleteAudio", doc.mongooseID)
                     // }
-                  
+
                     Message.deleteOne({ _id: doc._id }).then(doc => {
-                      //  console.log(doc)
+                        //  console.log(doc)
                         if (index === docs.length - 1) {
                             next()
                         }
@@ -278,6 +279,25 @@ router.get("/hasAvatar/:personName", (req, res, next) => {
 
 
 })
+
+router.get("/getdescription/:name", authenticateToken, (req, res, next) => {
+
+    User.findOne({userName:req.params.name}).then(doc=>{
+     
+        res.json(doc.description)
+    })
+})
+
+router.post("/updatedescription", authenticateToken, (req, res, next) => {
+
+  
+
+    User.updateOne({userName:req.userName},{description:req.body.description}).then(doc=>{
+      
+        res.json(doc)
+    })
+})
+
 
 
 
