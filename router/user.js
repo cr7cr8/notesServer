@@ -117,7 +117,7 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
     arr = arr.map((item) => {
         return {
             name: item.userName,
-            randomStr:item.randomStr,
+            randomStr: item.randomStr,
             hasAvatar: item.hasAvatar,
             key: Math.random()
         }
@@ -282,23 +282,26 @@ router.get("/hasAvatar/:personName", (req, res, next) => {
 
 router.get("/getdescription/:name", authenticateToken, (req, res, next) => {
 
-    User.findOne({userName:req.params.name}).then(doc=>{
-     
+    User.findOne({ userName: req.params.name }).then(doc => {
+
         res.json(doc.description)
     })
 })
 
 router.post("/updatedescription", authenticateToken, (req, res, next) => {
 
-  
+    User.updateOne({ userName: req.userName }, { description: req.body.description }).then(doc => {
 
-    User.updateOne({userName:req.userName},{description:req.body.description}).then(doc=>{
-      
         res.json(doc)
     })
 })
 
+router.get("/deleteaccount", authenticateToken, (req, res, next) => {
 
+console.log("fdfsafsadf")
+
+res.json("Fdsf")
+})
 
 
 

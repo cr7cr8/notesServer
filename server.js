@@ -42,7 +42,7 @@ app.get("/", function (req, res, next) {
 
   res.send(
     `<h2>${new Date()} current online: ${onlineArr.length}</h2>
-   ${onlineArr.map(socket =>socket.userName)}
+   ${onlineArr.map(socket => socket.userName)}
   
   
   
@@ -203,11 +203,7 @@ io.on("connection", function (socket) {
 
         onlineUsers.push(socket.userName)
       }
-      else {
-
-
-
-      }
+      else { }
     })
 
     User.find({}).then(docs => {
