@@ -7,7 +7,9 @@ mongoose.connection.on('error', function (err) {
 const { connDB, connDB2, connDB3, connDB4, connEmojiDB, DB, EmojiDB, connParam } = {
 
     //DB: "mongodb+srv://boss:ABCabc123@cluster0-lsf8g.azure.mongodb.net/notesDB?retryWrites=true&w=majority",
-    DB: "mongodb+srv://boss:ABCabc123@cluster1-lsf8g.azure.mongodb.net/notesDB?retryWrites=true&w=majority",
+   // DB: "mongodb+srv://boss:ABCabc123@cluster1-lsf8g.azure.mongodb.net/notesDB?retryWrites=true&w=majority",
+
+    DB:"mongodb+srv://boss:ABCabc123@cluster0.2lpo7.mongodb.net/notesDB?retryWrites=true&w=majority",
 
     // connParam: { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: true,/*poolSize:10*/ },
 
