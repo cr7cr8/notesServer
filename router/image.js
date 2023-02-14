@@ -17,6 +17,7 @@ const [
     uploadFile: uploadFile2,
     downloadFile: downloadFile2,
     deleteFileById: deleteFileById2,
+    deleteFileByPicName:deleteFileByPicName,
     deleteOldFile: deleteOldFile2
   },
 ] = require("../db/fileManager");
@@ -167,5 +168,13 @@ router.get("/delete/:id", authenticateToken, checkConnState,
 
 
 )
+
+router.get("/deleteimage/:id",authenticateToken,checkConnState,deleteFileByPicName,function(req,res,next){
+ 
+  res.json("deleted")
+})
+
+
+
 
 module.exports = router

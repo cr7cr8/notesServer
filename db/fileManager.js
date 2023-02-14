@@ -19,6 +19,8 @@ function createFileManager(connDB, collectionName) {
     downloadFile: function (req, res, next) { downloadFile(connDB, collectionName, req, res, next) },
     deleteFileByUserName: function (req, res, next) { deleteFileByUserName(connDB, collectionName, req, res, next) },
     deleteFileById: function (req, res, next) { deleteFileById(connDB, collectionName, req, res, next) },
+    deleteFileByPicName: function (req, res, next) { deleteFileByPicName(connDB, collectionName, req, res, next) },
+
     deleteOldFile: function (req, res, next) { deleteOldFile(connDB, collectionName, req, res, next) },
 
     isFileThere: function (req, res, next) { return isFileThere(connDB, collectionName, req, res, next) },
@@ -327,11 +329,30 @@ function deleteFileById(connDB, collectionName, req, res, next) {
 
 }
 
+function deleteFileByPicName(connDB, collectionName, req, res, next) {
+
+  var gfs = new mongoose.mongo.GridFSBucket(connDB.db, {
+    chunkSizeBytes: 255 * 1024,
+    bucketName: collectionName,
+  });
+  const cursor = gfs.find({ "metadata.picName": req.params.id }, { limit: 1 })
+
+  cursor.forEach(function (doc) {
+    gfs.delete(mongoose.Types.ObjectId(doc._id), function (err) {
+      err
+        ? (function () { console.log(err), res.status(500).send("deleting file error", err) }())
+        : console.log("file " + doc.filename + " " + doc._id + " deleted");
+    })
+  }).then(function () {
+    console.log("all requested files deleted")
+    next()
+  })
+
+}
 
 
 
-
-function getSmallImageArray(connDB, collectionName, req, res, next, ) {
+function getSmallImageArray(connDB, collectionName, req, res, next,) {
 
   req.files.forEach(function (imgFile, index) {
 
@@ -368,7 +389,7 @@ function getSmallImageArray(connDB, collectionName, req, res, next, ) {
 
 let imageWidth = null
 let imageHeight = null
-function getSmallImageArray2(connDB, collectionName, req, res, next, ) {
+function getSmallImageArray2(connDB, collectionName, req, res, next,) {
 
   req.files.forEach(function (imgFile, index) {
 
@@ -388,14 +409,14 @@ function getSmallImageArray2(connDB, collectionName, req, res, next, ) {
         if (width <= height) {
           imageWidth = width * 800 / height
           imageHeight = 800
-      
+
         }
 
         else if (width > height) {
 
           imageHeight = height * 800 / width
           imageWidth = 800
-     
+
 
         }
 
@@ -419,7 +440,7 @@ function getSmallImageArray2(connDB, collectionName, req, res, next, ) {
 
         imageWidth = width
         imageHeight = height
-    
+
 
 
         if (index === req.files.length - 1) { next() }
@@ -443,7 +464,7 @@ module.exports = [
   {
     ...createFileManager(connDB, "audio"),
   },
- 
+
 
 ]
 
