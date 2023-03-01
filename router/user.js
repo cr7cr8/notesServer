@@ -104,7 +104,7 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
 
     const userName = req.userName
     const docs = await User.find({})
-    const listOrder = docs.find(item => { return item.userName === userName }).listOrder
+    const listOrder = docs.find(item => { return item.userName === userName })?.listOrder ||[]
     let arr = []
     listOrder.forEach(item => {
         const doc = docs.find(doc => { return doc.userName === item })

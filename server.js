@@ -152,7 +152,7 @@ io.on("connection", function (socket) {
           console.log(doc.notiToken)
 
           if (doc.notiToken) {
-
+            console.log("sending offline noti")
             fetch('https://exp.host/--/api/v2/push/send', {
               method: 'POST',
               headers: {
@@ -216,7 +216,11 @@ io.on("connection", function (socket) {
       const msg = msgArr[0]
 
       msg.waitingUsers = offlineUsers
-      Message.create(msg)
+    
+      if (offlineUsers.length > 0) {
+        Message.create(msg)
+      }
+
 
     })
 
