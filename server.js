@@ -36,6 +36,7 @@ image.socketArr = socketArr
 audio.io = io
 audio.socketArr = socketArr
 
+console.log("start...")
 
 app.get("/", function (req, res, next) {
   const onlineArr = socketArr.filter(socket => socket.isAlive)

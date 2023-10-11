@@ -50,6 +50,13 @@ router.post("/uploadimage",
 
 router.post("/upload",
 
+// function (req, res, next) {
+//   console.log("adsfasd2222")
+//   next()
+// },
+
+
+
   checkConnState,
   getFileArray,
 
