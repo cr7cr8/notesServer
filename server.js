@@ -1,4 +1,9 @@
 
+//forever server.js start
+//taskkill /im node.exe /f
+
+
+
 const express = require("express")
 const app = express()
 const cors = require("cors");
@@ -48,6 +53,11 @@ app.get("/", function (req, res, next) {
   
   
  `)
+
+    // setTimeout(() => {
+    //   throw new Error("ouououououo")
+    // }, 3000);
+
 
 })
 
