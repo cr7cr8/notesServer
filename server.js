@@ -1,7 +1,7 @@
 
 //forever server.js start
 //taskkill /im node.exe /f
-
+//forever start --minUptime 3600000 --spinSleepTime 1000 server.js
 
 
 const express = require("express")
