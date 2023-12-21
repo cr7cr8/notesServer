@@ -1,7 +1,7 @@
 
 //forever server.js start
 //taskkill /im node.exe /f
-//forever start --minUptime 3600000 --spinSleepTime 1000 server.js
+//forever start --minUptime 360000000 --spinSleepTime 1000 server.js
 
 
 const express = require("express")
@@ -49,17 +49,18 @@ app.get("/", function (req, res, next) {
   res.send(
     `<h2>${new Date()} current online: ${onlineArr.length}</h2>
    ${onlineArr.map(socket => socket.userName)}
-  
-  
-  
  `)
 
     // setTimeout(() => {
     //   throw new Error("ouououououo")
     // }, 3000);
-
-
 })
+
+
+app.get('/chatnote', function(req, res){
+  const file = `${__dirname}/chatnote8.apk`;
+  res.download(file); // Set disposition and send it.
+});
 
 
 

@@ -102,6 +102,9 @@ router.post("/reguser", async (req, res, next) => {
 
 router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
 
+
+
+
     const userName = req.userName
     const docs = await User.find({})
     const listOrder = docs.find(item => { return item.userName === userName })?.listOrder ||[]
@@ -127,7 +130,7 @@ router.get("/fetchuserlist", authenticateToken, async (req, res, next) => {
 
 router.get("/fetchuserlist2", async (req, res, next) => {
 
-
+    
     const docs = await User.find({})
 
     //console.log(docs)
