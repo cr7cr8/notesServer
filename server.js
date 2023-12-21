@@ -49,6 +49,10 @@ app.get("/", function (req, res, next) {
   res.send(
     `<h2>${new Date()} current online: ${onlineArr.length}</h2>
    ${onlineArr.map(socket => socket.userName)}
+
+
+   <a href="/chatnote"><h3>Download Chatnote8 App</h3></a>
+
  `)
 
     // setTimeout(() => {
